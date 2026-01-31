@@ -13,8 +13,8 @@
   "author": "htmltoexe",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^31.0.0",
-    "electron-builder": "^24.0.0"
+    "electron": "^11.5.0",
+    "electron-builder": "^22.14.13"
   },
   "dependencies": {
     "electron-config": "^2.0.0"
@@ -27,7 +27,8 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "icon.png"
+      "icon": "icon.png",
+      "publish": null
     }
   }
 }

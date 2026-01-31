@@ -15,14 +15,16 @@ def build_exe():
     try:
         print("正在构建 exe 文件...")
         # 使用 pyinstaller 打包
-        subprocess.run([
-            "pyinstaller", 
-            "--onefile", 
-            "--windowed", 
-            "--add-data", "config.json;.", 
-            "--name", "htmltoexe", 
+        cmd = [
+            "pyinstaller",
+            "--onefile",
+            "--windowed",
+            "--add-data", "config.json;.",
+            "--name", "htmltoexe",
             "main.py"
-        ], check=True)
+        ]
+        # 在 Windows 7 上可能需要指定 Python 版本兼容性
+        subprocess.run(cmd, check=True)
         print("构建成功！exe 文件位于 dist/htmltoexe.exe")
     except subprocess.CalledProcessError as e:
         print(f"构建失败: {e}")

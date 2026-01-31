@@ -61,9 +61,13 @@ GitHub Actions 会在每次提交时自动构建 Electron 框架，用户只需�
 ## 技术栈
 
 - Python: 用于构建用户界面和配置管理
-- Electron: 用于创建跨平台桌面应用
+- Electron: 用于创建跨平台桌面应用 (兼容 Windows 7 及以上版本)
 - Node.js: 用于构建和打包工具链
 - PyInstaller: 用于将 Python 脚本打包为独立的 exe 文件
+
+## Windows 7 兼容性
+
+本工具支持在 Windows 7 及更高版本的系统上运行。为确保最佳兼容性，Electron 版本已设置为 11.5.0，这是对 Windows 7 支持较好的版本。
 
 ## 下载
 

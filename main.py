@@ -92,8 +92,8 @@ def modify_electron_app():
             "transparent": False,
             "backgroundColor": "#ffffff",
             "webPreferences": {
-                "nodeIntegration": False,
-                "contextIsolation": True
+                "nodeIntegration": True,  # Windows 7 兼容性考虑
+                "contextIsolation": False  # Windows 7 兼容性考虑
             }
         }
     }
