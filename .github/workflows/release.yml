@@ -35,7 +35,7 @@ jobs:
         echo "当前目录内容:"
         dir
         echo "开始构建 Electron 应用..."
-        npx electron-builder --win dir --config --verbose
+        npx electron-builder --win dir --config
         echo "构建完成，检查输出目录:"
         dir
         if (Test-Path "dist") {
