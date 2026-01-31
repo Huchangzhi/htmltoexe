@@ -14,12 +14,12 @@
 ### 方式一：使用预打包的工具（推荐）
 
 1. 从 Actions 下载完整的包：
-   - `htmltoexe-complete` - 完整的应用包（包含 htmltoexe.exe 和预构建的 webview.exe）
+   - `htmltoexe-complete` - 完整的应用包（包含 htmltoexe.exe 和预构建的 electron-framework 目录）
 2. 解压后运行 `htmltoexe.exe`
 3. 在界面中填写应用名称、网站 URL、选择图标和输出路径
 4. 点击"生成"按钮，程序会自动创建定制化的 Web 应用
-5. 生成的应用包含一个 exe 文件和一个 config.json 配置文件
-6. 运行 exe 文件即可启动定制化的 Web 应用
+5. 生成的应用包含一个完整的 Electron 应用目录，其中有一个 exe 文件和一个 config.json 配置文件
+6. 运行目录中的 exe 文件即可启动定制化的 Web 应用
 
 ### 方式二：手动配置
 

@@ -61,23 +61,22 @@ def modify_electron_app():
         messagebox.showerror("错误", "输出路径不能为空!")
         return
 
-    # 定义路径 - 在当前目录下查找 webview.exe (预构建的 Electron 应用)
-    electron_exe = "webview.exe"  # 预构建的 Electron 应用
+    # 定义路径 - 在当前目录下查找 electron-framework (预构建的 Electron 应用目录)
+    electron_framework_dir = "electron-framework"  # 预构建的 Electron 应用目录
 
-    # 检查预构建的 Electron 应用是否存在
-    if not os.path.exists(electron_exe):
-        messagebox.showerror("错误", f"未找到预构建的 Electron 应用 '{electron_exe}'! 请确保已下载完整的包.")
+    # 检查预构建的 Electron 应用目录是否存在
+    if not os.path.exists(electron_framework_dir):
+        messagebox.showerror("错误", f"未找到预构建的 Electron 应用目录 '{electron_framework_dir}'! 请确保已下载完整的包.")
         return
 
     # 创建输出目录
     final_output_path = os.path.join(output_path, name)
-    if not os.path.exists(final_output_path):
-        os.makedirs(final_output_path)
 
-    # 复制预构建的 Electron 应用到输出目录
+    # 复制预构建的 Electron 应用目录到输出目录
     try:
-        output_exe = os.path.join(final_output_path, f"{name}.exe")
-        shutil.copy2(electron_exe, output_exe)
+        if os.path.exists(final_output_path):
+            shutil.rmtree(final_output_path)  # 如果已存在,删除它
+        shutil.copytree(electron_framework_dir, final_output_path)
     except Exception as e:
         messagebox.showerror("错误", f"复制 Electron 应用失败: {e}")
         return
@@ -117,7 +116,7 @@ def modify_electron_app():
             messagebox.showerror("错误", f"复制图标文件失败: {e}")
             return
 
-    messagebox.showinfo("成功", f"Web 应用已成功生成! 文件位于 '{final_output_path}'.\n\n您可以直接运行 {name}.exe 来启动应用。\n\n注意：{name}.exe 会读取同目录下的 config.json 文件来加载网站。")
+    messagebox.showinfo("成功", f"Web 应用已成功生成! 文件位于 '{final_output_path}'.\n\n您可以直接运行其中的 exe 文件来启动应用。\n\n注意：应用会读取同目录下的 config.json 文件来加载网站。")
 
 # 创建 Tkinter 图形界面
 root = tk.Tk()

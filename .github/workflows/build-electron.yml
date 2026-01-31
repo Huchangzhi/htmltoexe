@@ -26,7 +26,7 @@ jobs:
     - name: Build Electron app
       run: |
         cd electron-template
-        npx electron-builder --win portable --config
+        npx electron-builder --win dir --config
 
     - name: Setup Python
       uses: actions/setup-python@v4
@@ -46,13 +46,12 @@ jobs:
         # 创建完整的应用包
         New-Item -ItemType Directory -Path "htmltoexe-complete" -Force
         Copy-Item "dist\htmltoexe.exe" -Destination "htmltoexe-complete\"
-        # 复制已构建的 Electron 应用
-        $electronDist = Get-ChildItem -Path "electron-template\dist" -Filter "*.exe" | Select-Object -First 1
-        if ($electronDist) {
-          Copy-Item $electronDist.FullName -Destination "htmltoexe-complete\webview.exe"
+        # 复制已构建的 Electron 应用目录
+        if (Test-Path "electron-template\dist") {
+          Copy-Item -Recurse "electron-template\dist\*" -Destination "htmltoexe-complete\electron-framework\"
         } else {
           Write-Host "警告: 未找到构建的 Electron 应用"
-          # 如果没找到构建的exe，至少复制模板文件
+          # 如果没找到构建的目录，至少复制模板文件
           Copy-Item -Recurse "electron-template" -Destination "htmltoexe-complete\electron-template"
         }
         Copy-Item "config.json" -Destination "htmltoexe-complete\"
