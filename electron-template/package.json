@@ -13,8 +13,8 @@
   "author": "htmltoexe",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^latest",
-    "electron-builder": "^latest"
+    "electron": "^31.0.0",
+    "electron-builder": "^24.0.0"
   },
   "dependencies": {
     "electron-config": "^2.0.0"

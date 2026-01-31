@@ -58,6 +58,13 @@
 
 GitHub Actions 会在每次提交时自动构建 Electron 框架，用户只需下载预构建的工具即可使用。
 
+## 技术栈
+
+- Python: 用于构建用户界面和配置管理
+- Electron: 用于创建跨平台桌面应用
+- Node.js: 用于构建和打包工具链
+- PyInstaller: 用于将 Python 脚本打包为独立的 exe 文件
+
 ## 下载
 
 [下载 htmltoexe 工具](https://github.com/Huchangzhi/htmltoexe/releases/download/v1.0.1/htmltoexe.exe)
