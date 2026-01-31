@@ -143,7 +143,7 @@ function showAboutDialog() {
         <div class="info">
           <h2>${appName}</h2>
           <p>打包工具: <a href="#" class="link" onclick="openLink('https://github.com/huchangzhi/htmltoexe')">https://github.com/huchangzhi/htmltoexe</a></p>
-          <p>版本: 1.0.0</p>
+          <p>版本: 2.0.1</p>
         </div>
       </div>
       <script>
