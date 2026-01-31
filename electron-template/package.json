@@ -1,0 +1,33 @@
+{
+  "name": "electron-web-app",
+  "version": "1.0.0",
+  "description": "A web application packaged with Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": [
+    "electron"
+  ],
+  "author": "htmltoexe",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^latest",
+    "electron-builder": "^latest"
+  },
+  "dependencies": {
+    "electron-config": "^2.0.0"
+  },
+  "build": {
+    "appId": "com.htmltoexe.electron-web-app",
+    "productName": "Electron Web App",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icon.png"
+    }
+  }
+}

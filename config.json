@@ -1,0 +1,19 @@
+{
+  "appName": "My Web App",
+  "websiteUrl": "https://www.example.com",
+  "iconPath": "./icon.png",
+  "outputDir": "./dist",
+  "electron": {
+    "width": 1200,
+    "height": 800,
+    "resizable": true,
+    "fullscreen": false,
+    "frame": true,
+    "transparent": false,
+    "backgroundColor": "#ffffff",
+    "webPreferences": {
+      "nodeIntegration": false,
+      "contextIsolation": true
+    }
+  }
+}
