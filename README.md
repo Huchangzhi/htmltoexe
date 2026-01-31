@@ -13,14 +13,11 @@
 
 ### 方式一：使用预打包的工具（推荐）
 
-1. 从 Actions 下载两个文件：
-   - `htmltoexe.exe` - 主程序
-   - `electron-framework` 文件夹 - Electron 框架
-2. 将这两个文件放在同一个目录下
-3. 准备好您的网站 URL 和应用图标
-4. 运行 `htmltoexe.exe`
-5. 在界面中填写应用名称、网站 URL、选择图标和输出路径
-6. 点击"生成"按钮，程序会修改框架配置并复制到指定位置
+1. 从 Actions 下载完整的包：
+   - `htmltoexe-complete` - 完整的应用包（包含 htmltoexe.exe 和 electron-framework）
+2. 解压后运行 `htmltoexe.exe`
+3. 在界面中填写应用名称、网站 URL、选择图标和输出路径
+4. 点击"生成"按钮，程序会自动创建定制化的 Electron 应用
 
 ### 方式二：手动配置
 
@@ -57,10 +54,9 @@
 - `main.py`: 主程序，提供图形界面
 - `config.json`: 默认配置文件
 - `electron-template/`: Electron 应用模板（用于构建框架）
-- `electron-framework/`: Electron 应用框架（运行时修改）
 - `.github/workflows/build-electron.yml`: GitHub Actions 构建配置
 
-GitHub Actions 会在每次提交时自动构建 htmltoexe.exe 和 electron-framework 文件夹，用户下载这两个组件后即可使用。
+GitHub Actions 会在每次提交时自动构建完整的 `htmltoexe-complete` 包，其中包含 htmltoexe.exe 和 electron-framework 文件夹，用户下载后即可使用。
 
 ## 技术栈
 
@@ -79,11 +75,11 @@ GitHub Actions 会在每次提交时自动构建 htmltoexe.exe 和 electron-fram
 
 1. 访问 [Actions 页面](../../actions)
 2. 点击最新的构建任务
-3. 下载以下两个构件：
-   - `htmltoexe-exe` - 主程序
-   - `electron-framework` - Electron 框架
+3. 下载以下构件之一：
+   - `htmltoexe-complete` - 完整的应用包（推荐）
+   - 或分别下载 `htmltoexe-exe` 和 `electron-framework`
 
-将这两个文件放在同一目录下即可使用。
+如果下载的是完整包，解压后直接运行 htmltoexe.exe 即可。
 
 ## 许可证
 
