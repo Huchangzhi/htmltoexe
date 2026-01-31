@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -73,6 +73,102 @@ function loadConfig() {
   };
 }
 
+// 创建关于对话框
+function showAboutDialog() {
+  const config = loadConfig();
+  const appName = config.appName || 'Web Application';
+
+  // 创建一个简单的关于对话框窗口
+  const aboutWindow = new BrowserWindow({
+    width: 400,
+    height: 300,
+    resizable: false,
+    modal: true,
+    parent: BrowserWindow.getFocusedWindow(),
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  // 设置窗口标题
+  aboutWindow.setTitle('关于 ' + appName);
+
+  // 创建关于页面的HTML内容
+  const aboutHTML = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>关于 ${appName}</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
+          padding: 20px;
+          background: #f5f5f5;
+          margin: 0;
+        }
+        .container {
+          text-align: center;
+          max-width: 350px;
+          margin: 0 auto;
+        }
+        .logo {
+          width: 80px;
+          height: 80px;
+          margin-bottom: 15px;
+        }
+        h2 {
+          margin-top: 0;
+          color: #333;
+        }
+        .info {
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .link {
+          color: #0969da;
+          text-decoration: none;
+          font-weight: 500;
+        }
+        .link:hover {
+          text-decoration: underline;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="info">
+          <h2>${appName}</h2>
+          <p>打包工具: <a href="#" class="link" onclick="openLink('https://github.com/huchangzhi/htmltoexe')">https://github.com/huchangzhi/htmltoexe</a></p>
+          <p>版本: 1.0.0</p>
+        </div>
+      </div>
+      <script>
+        function openLink(url) {
+          // 通过 IPC 发送到主进程打开外部链接
+          if (typeof require !== 'undefined') {
+            const { ipcRenderer } = require('electron');
+            ipcRenderer.send('open-external-link', url);
+          }
+        }
+      </script>
+    </body>
+    </html>
+  `;
+
+  aboutWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(aboutHTML));
+
+  // 监听打开外部链接事件
+  aboutWindow.webContents.on('ipc-message', (event, channel, url) => {
+    if (channel === 'open-external-link') {
+      shell.openExternal(url);
+    }
+  });
+}
+
 function createWindow() {
   const config = loadConfig();
 
@@ -98,9 +194,16 @@ function createWindow() {
   const mainWindow = new BrowserWindow(windowOptions);
   mainWindow.loadURL(config.websiteUrl);
 
-  // 生产环境下隐藏菜单栏
-  mainWindow.setMenuBar(false);
-  mainWindow.setAutoHideMenuBar(true);
+  // 创建自定义菜单
+  const menuTemplate = [
+    {
+      label: '关于',
+      click: () => showAboutDialog()
+    }
+  ];
+
+  const menu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(menu);
 
   // 打开开发者工具（仅开发环境）
   // mainWindow.webContents.openDevTools();
