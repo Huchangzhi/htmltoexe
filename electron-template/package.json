@@ -1,7 +1,7 @@
 {
-  "name": "webview",
-  "version": "1.0.0",
-  "description": "A web application packaged with Electron",
+  "name": "main",
+  "version": "2.0.2",
+  "description": "由网页打包而来的软件罢了",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -10,7 +10,7 @@
   "keywords": [
     "electron"
   ],
-  "author": "htmltoexe",
+  "author": "Unknownhcz",
   "license": "MIT",
   "devDependencies": {
     "electron": "^22.3.27",
@@ -20,8 +20,8 @@
     "electron-config": "^2.0.0"
   },
   "build": {
-    "appId": "com.htmltoexe.webview",
-    "productName": "WebView",
+    "appId": "com.htmltoexe.main",
+    "productName": "main",
     "directories": {
       "output": "dist"
     },

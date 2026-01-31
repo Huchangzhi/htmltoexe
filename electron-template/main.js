@@ -61,6 +61,7 @@ function loadConfig() {
   console.log('未找到配置文件，使用默认设置');
   return {
     websiteUrl: 'https://www.example.com',
+    appName: 'Web Application', // 添加默认应用名称
     windowOptions: {
       width: 1200,
       height: 800,
@@ -77,11 +78,39 @@ function loadConfig() {
 function showAboutDialog() {
   const config = loadConfig();
   const appName = config.appName || 'Web Application';
+  const iconPath = config.iconPath ? path.resolve(path.dirname(process.execPath), config.iconPath) : '';
+
+  // 读取 package.json 获取版本号
+  let appVersion = '2.0.0'; // 默认版本
+  try {
+    // 尝试从 resources/app/package.json 读取（Electron 打包后的位置）
+    let packageJsonPath = path.join(process.resourcesPath, 'app', 'package.json');
+    if (!fs.existsSync(packageJsonPath)) {
+      // 如果不在 resources/app 中，尝试在可执行文件同级目录
+      packageJsonPath = path.join(path.dirname(process.execPath), 'package.json');
+    }
+
+    if (fs.existsSync(packageJsonPath)) {
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+      appVersion = packageJson.version || appVersion;
+    } else {
+      // 如果 resources/app/package.json 不存在，尝试读取 asar 包内的 package.json
+      // 通过 require 读取 asar 包内的 package.json
+      try {
+        const appPackage = require(path.join(process.resourcesPath, 'app.asar', 'package.json'));
+        appVersion = appPackage.version || appVersion;
+      } catch (asarErr) {
+        console.error('读取 asar 包内的 package.json 失败:', asarErr);
+      }
+    }
+  } catch (err) {
+    console.error('读取版本号失败:', err);
+  }
 
   // 创建一个简单的关于对话框窗口
   const aboutWindow = new BrowserWindow({
     width: 400,
-    height: 300,
+    height: 350,
     resizable: false,
     modal: true,
     parent: BrowserWindow.getFocusedWindow(),
@@ -95,6 +124,18 @@ function showAboutDialog() {
   aboutWindow.setTitle('关于 ' + appName);
 
   // 创建关于页面的HTML内容
+  let logoHtml = '';
+  if (iconPath && fs.existsSync(iconPath)) {
+    // 如果图标存在，将其编码为 base64 以便在 HTML 中显示
+    const logoData = fs.readFileSync(iconPath);
+    const logoBase64 = logoData.toString('base64');
+    const logoExt = path.extname(iconPath).substring(1); // 获取文件扩展名，去掉点号
+    logoHtml = `<img src="data:image/${logoExt};base64,${logoBase64}" alt="Logo" class="logo">`;
+  } else {
+    // 如果没有图标，显示一个占位符
+    logoHtml = `<div class="logo-placeholder">🌐</div>`;
+  }
+
   const aboutHTML = `
     <!DOCTYPE html>
     <html>
@@ -117,6 +158,18 @@ function showAboutDialog() {
           width: 80px;
           height: 80px;
           margin-bottom: 15px;
+          border-radius: 8px;
+        }
+        .logo-placeholder {
+          width: 80px;
+          height: 80px;
+          margin: 0 auto 15px;
+          font-size: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #ddd;
+          border-radius: 8px;
         }
         h2 {
           margin-top: 0;
@@ -141,8 +194,10 @@ function showAboutDialog() {
     <body>
       <div class="container">
         <div class="info">
+          ${logoHtml}
           <h2>${appName}</h2>
-          <p>Powerd by <a href="#" class="link" onclick="openLink('https://github.com/huchangzhi/htmltoexe')">htmltoexev2.0.1</a></p>
+          <p>版本: ${appVersion}</p>
+          <p>powerd by <a href="#" class="link" onclick="openLink('https://github.com/huchangzhi/htmltoexe')">htmltoexe</a></p>
         </div>
       </div>
       <script>

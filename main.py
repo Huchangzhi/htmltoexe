@@ -83,6 +83,7 @@ def modify_electron_app():
 
     # 创建配置文件 - 这个配置文件会被 Electron 应用读取
     config = {
+        "appName": name,  # 添加应用名称
         "websiteUrl": url,
         "iconPath": icon_path if icon_path else "./icon.png",
         "windowOptions": {
