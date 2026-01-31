@@ -96,7 +96,7 @@ def modify_electron_app():
         }
     }
 
-    # 保存配置到输出目录
+    # 保存配置到输出目录（与 exe 同级）
     config_path = os.path.join(final_output_path, "config.json")
     if not save_config(config, config_path):
         return

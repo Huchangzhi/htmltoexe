@@ -46,9 +46,9 @@ jobs:
         # 创建完整的应用包
         New-Item -ItemType Directory -Path "htmltoexe-complete" -Force
         Copy-Item "dist\htmltoexe.exe" -Destination "htmltoexe-complete\"
-        # 复制已构建的 Electron 应用目录
-        if (Test-Path "electron-template\dist") {
-          Copy-Item -Recurse "electron-template\dist\*" -Destination "htmltoexe-complete\electron-framework\"
+        # 复制已构建的 Electron 应用目录并重命名
+        if (Test-Path "electron-template\dist\win-unpacked") {
+          Copy-Item -Recurse "electron-template\dist\win-unpacked" -Destination "htmltoexe-complete\electron-framework"
         } else {
           Write-Host "警告: 未找到构建的 Electron 应用"
           # 如果没找到构建的目录，至少复制模板文件
