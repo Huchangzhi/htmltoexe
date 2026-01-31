@@ -1,25 +1,26 @@
 # HTML to EXE
 
-快速将网页打包成桌面应用程序的工具，支持 Nativefier 和 Electron 两种方式。
+快速将网页打包成桌面应用程序的工具，支持 Electron 方式。
 
 ## 功能特性
 
 - 🚀 快速打包：一键将网页转换为桌面应用
 - 🎨 自定义配置：支持自定义应用名称、图标等
-- ⚡ 两种引擎：支持 Nativefier 和 Electron 打包方式
+- ⚡ Electron 引擎：使用 Electron 打包方式
 - 📁 配置文件：通过 config.json 管理应用配置
+- 💻 Windows 7 兼容：支持在 Windows 7 及以上版本运行
 
 ## 使用方法
 
 ### 方式一：使用预打包的工具（推荐）
 
-1. 从 Actions 下载完整的包：
-   - `htmltoexe-complete` - 完整的应用包（包含 htmltoexe.exe 和预构建的 electron-framework 目录）
+1. 从 Releases 页面下载完整的包：
+   - `htmltoexe-complete-vX.X.X.zip` - 完整的应用包（包含 htmltoexe.exe 和 electron-framework 目录）
 2. 解压后运行 `htmltoexe.exe`
 3. 在界面中填写应用名称、网站 URL、选择图标和输出路径
 4. 点击"生成"按钮，程序会自动创建定制化的 Web 应用
-5. 生成的应用包含一个完整的 Electron 应用目录，其中有一个 exe 文件和一个 config.json 配置文件
-6. 运行目录中的 exe 文件即可启动定制化的 Web 应用
+5. 生成的应用包含一个独立的文件夹，其中有一个 exe 文件和一个 config.json 配置文件
+6. 运行 exe 文件即可启动定制化的 Web 应用
 
 ### 方式二：手动配置
 
@@ -49,10 +50,15 @@
 
 - `main.py`: 主程序，提供图形界面
 - `config.json`: 默认配置文件
-- `electron-template/`: Electron 应用模板（用于构建预打包的 webview.exe）
+- `electron-template/`: Electron 应用模板（用于构建预打包的 electron-framework）
 - `.github/workflows/build-electron.yml`: GitHub Actions 构建配置
+- `.github/workflows/release.yml`: GitHub Actions 发布配置（手动触发）
 
-GitHub Actions 会在每次提交时自动构建完整的 `htmltoexe-complete` 包，其中包含 htmltoexe.exe 和预构建的 webview.exe，用户下载后即可使用。
+构建流程：
+1. GitHub Actions 构建 Electron 应用（生成 electron-framework 目录）
+2. 构建 htmltoexe.exe
+3. 将两者打包成 htmltoexe-complete 压缩包
+4. 发布到 Releases 页面
 
 ## 技术栈
 
@@ -63,19 +69,25 @@ GitHub Actions 会在每次提交时自动构建完整的 `htmltoexe-complete` �
 
 ## Windows 7 兼容性
 
-本工具支持在 Windows 7 及更高版本的系统上运行。为确保最佳兼容性，Electron 版本已设置为 11.5.0，这是对 Windows 7 支持较好的版本。
+本工具支持在 Windows 7 及更高版本的系统上运行。为确保最佳兼容性，Electron 版本已设置为 22.3.27，这是支持 Windows 7 的最后一个版本。
 
 ## 下载
 
-由于现在采用新的构建方式，您需要从 GitHub Actions 中下载构建产物：
+从 [Releases 页面](../../releases) 下载最新版本：
 
-1. 访问 [Actions 页面](../../actions)
-2. 点击最新的构建任务
-3. 下载以下构件之一：
-   - `htmltoexe-complete` - 完整的应用包（推荐）
-   - 或分别下载 `htmltoexe-exe` 和 `electron-framework`
+1. 访问 [Releases 页面](../../releases)
+2. 下载最新的 `htmltoexe-complete-vX.X.X.zip` 文件
+3. 解压后即可使用
 
-如果下载的是完整包，解压后直接运行 htmltoexe.exe 即可。
+## 如何发布新版本
+
+维护者可以使用手动触发的 Actions 发布新版本：
+
+1. 访问 Actions 页面
+2. 选择 "Release HTMLtoEXE" 工作流
+3. 点击 "Run workflow"
+4. 输入版本号（如 1.0.0）和发布说明
+5. Actions 会自动构建并创建新的 Release
 
 ## 许可证
 
