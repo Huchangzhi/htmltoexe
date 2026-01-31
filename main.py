@@ -59,40 +59,35 @@ def modify_electron_app():
         messagebox.showerror("错误", "输出路径不能为空!")
         return
 
-    # 定义路径 - 在当前目录下查找 electron-framework 文件夹
-    electron_framework_dir = "electron-framework"  # 预打包的 Electron 应用框架
+    # 定义路径 - 在当前目录下查找 webview.exe (预构建的 Electron 应用)
+    electron_exe = "webview.exe"  # 预构建的 Electron 应用
 
-    # 检查 Electron 框架是否存在
-    if not os.path.exists(electron_framework_dir):
-        messagebox.showerror("错误", f"未找到 Electron 框架文件夹 '{electron_framework_dir}'! 请确保已下载预打包的 Electron 框架.")
+    # 检查预构建的 Electron 应用是否存在
+    if not os.path.exists(electron_exe):
+        messagebox.showerror("错误", f"未找到预构建的 Electron 应用 '{electron_exe}'! 请确保已下载完整的包.")
         return
 
-    # 创建修改后的应用目录
-    modified_app_dir = f"{name}-app"
+    # 创建输出目录
+    final_output_path = os.path.join(output_path, name)
+    if not os.path.exists(final_output_path):
+        os.makedirs(final_output_path)
 
-    # 复制框架到新目录进行修改
+    # 复制预构建的 Electron 应用到输出目录
     try:
-        if os.path.exists(modified_app_dir):
-            shutil.rmtree(modified_app_dir)  # 如果已存在,删除它
-        shutil.copytree(electron_framework_dir, modified_app_dir)
+        output_exe = os.path.join(final_output_path, f"{name}.exe")
+        shutil.copy2(electron_exe, output_exe)
     except Exception as e:
-        messagebox.showerror("错误", f"复制 Electron 框架失败: {e}")
+        messagebox.showerror("错误", f"复制 Electron 应用失败: {e}")
         return
 
-    # 更新配置文件
+    # 创建配置文件 - 这个配置文件会被 Electron 应用读取
     config = {
-        "appName": name,
         "websiteUrl": url,
         "iconPath": icon_path if icon_path else "./icon.png",
-        "outputDir": output_path,
-        "electron": {
+        "windowOptions": {
             "width": 1200,
             "height": 800,
             "resizable": True,
-            "fullscreen": False,
-            "frame": True,
-            "transparent": False,
-            "backgroundColor": "#ffffff",
             "webPreferences": {
                 "nodeIntegration": True,  # Windows 7 兼容性考虑
                 "contextIsolation": False  # Windows 7 兼容性考虑
@@ -100,31 +95,26 @@ def modify_electron_app():
         }
     }
 
-    # 保存配置到应用目录
-    config_path = os.path.join(modified_app_dir, "config.json")
+    # 保存配置到输出目录
+    config_path = os.path.join(final_output_path, "config.json")
     if not save_config(config):
         return
 
-    # 如果提供了图标，则复制到应用目录
+    # 如果提供了图标，则复制到输出目录
     if icon_path and os.path.exists(icon_path):
         try:
-            app_icon_path = os.path.join(modified_app_dir, "icon.png")
-            shutil.copy(icon_path, app_icon_path)
+            output_icon_path = os.path.join(final_output_path, os.path.basename(icon_path))
+            shutil.copy2(icon_path, output_icon_path)
+
+            # 更新配置文件中的图标路径
+            config["iconPath"] = os.path.basename(icon_path)
+            if not save_config(config):
+                return
         except Exception as e:
             messagebox.showerror("错误", f"复制图标文件失败: {e}")
             return
 
-    # 移动到最终输出路径
-    try:
-        final_output_path = os.path.join(output_path, name)
-        if os.path.exists(final_output_path):
-            shutil.rmtree(final_output_path)  # 如果目标路径已存在,删除它
-        shutil.move(modified_app_dir, final_output_path)
-    except Exception as e:
-        messagebox.showerror("错误", f"移动应用到输出目录失败: {e}")
-        return
-
-    messagebox.showinfo("成功", f"Electron 应用已成功生成! 文件位于 '{final_output_path}'.")
+    messagebox.showinfo("成功", f"Web 应用已成功生成! 文件位于 '{final_output_path}'.\n\n您可以直接运行 {name}.exe 来启动应用。")
 
 # 创建 Tkinter 图形界面
 root = tk.Tk()

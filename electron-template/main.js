@@ -1,85 +1,96 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
-// 创建浏览器窗口
-function createWindow() {
-  // 读取配置文件
-  let config = {
-    appName: 'My Web App',
-    websiteUrl: 'https://www.example.com',
-    iconPath: './icon.png',
-    electron: {
-      width: 1200,
-      height: 800,
-      resizable: true,
-      fullscreen: false,
-      frame: true,
-      transparent: false,
-      backgroundColor: '#ffffff',
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true
+// 读取配置文件
+function loadConfig() {
+  const configPath = path.join(process.resourcesPath, 'config.json'); // 从资源目录读取
+  const fallbackConfigPath = path.join(path.dirname(process.execPath), 'config.json'); // 从同级目录读取
+
+  let configData;
+  
+  // 尝试从不同位置读取配置文件
+  if (fs.existsSync(configPath)) {
+    configData = fs.readFileSync(configPath, 'utf8');
+  } else if (fs.existsSync(fallbackConfigPath)) {
+    configData = fs.readFileSync(fallbackConfigPath, 'utf8');
+  } else {
+    // 如果没有配置文件，使用默认配置
+    return {
+      websiteUrl: 'https://www.example.com',
+      windowOptions: {
+        width: 1200,
+        height: 800,
+        resizable: true,
+        webPreferences: {
+          nodeIntegration: false,
+          contextIsolation: true
+        }
       }
+    };
+  }
+
+  try {
+    return JSON.parse(configData);
+  } catch (err) {
+    console.error('解析配置文件失败:', err);
+    return {
+      websiteUrl: 'https://www.example.com',
+      windowOptions: {
+        width: 1200,
+        height: 800,
+        resizable: true,
+        webPreferences: {
+          nodeIntegration: false,
+          contextIsolation: true
+        }
+      }
+    };
+  }
+}
+
+function createWindow() {
+  const config = loadConfig();
+
+  const windowOptions = {
+    width: config.windowOptions?.width || 1200,
+    height: config.windowOptions?.height || 800,
+    resizable: config.windowOptions?.resizable !== false,
+    webPreferences: {
+      ...(config.windowOptions?.webPreferences || {}),
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: config.windowOptions?.webPreferences?.nodeIntegration || false,
+      contextIsolation: config.windowOptions?.webPreferences?.contextIsolation !== false
     }
   };
 
-  // 尝试从 config.json 读取配置
-  const configPath = path.join(__dirname, 'config.json');
-  if (fs.existsSync(configPath)) {
-    try {
-      const configFile = fs.readFileSync(configPath, 'utf8');
-      const loadedConfig = JSON.parse(configFile);
-      
-      // 合并配置
-      config = { ...config, ...loadedConfig };
-    } catch (err) {
-      console.error('读取配置文件失败:', err);
+  // 如果有图标路径，添加图标
+  if (config.iconPath) {
+    const iconPath = path.resolve(path.dirname(process.execPath), config.iconPath);
+    if (fs.existsSync(iconPath)) {
+      windowOptions.icon = iconPath;
     }
   }
 
-  // 创建浏览器窗口
-  const mainWindow = new BrowserWindow({
-    width: config.electron.width || 1200,
-    height: config.electron.height || 800,
-    resizable: config.electron.resizable !== false,
-    fullscreen: config.electron.fullscreen || false,
-    frame: config.electron.frame !== false,
-    transparent: config.electron.transparent || false,
-    backgroundColor: config.electron.backgroundColor || '#ffffff',
-    icon: path.join(__dirname, 'icon.png'),
-    webPreferences: {
-      ...config.electron.webPreferences,
-      preload: path.join(__dirname, 'preload.js')
-    }
-  });
-
-  // 加载网站
+  const mainWindow = new BrowserWindow(windowOptions);
   mainWindow.loadURL(config.websiteUrl);
 
-  // 打开开发者工具（可选）
-  // mainWindow.webContents.openDevTools();
+  // 生产环境下隐藏菜单栏
+  mainWindow.setMenuBar(false);
+  mainWindow.setAutoHideMenuBar(true);
 
-  // 当窗口关闭时
-  mainWindow.on('closed', () => {
-    app.quit();
-  });
+  // 打开开发者工具（仅开发环境）
+  // mainWindow.webContents.openDevTools();
 }
 
-// 当 Electron 完成初始化时
 app.whenReady().then(() => {
   createWindow();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
+  app.on('activate', function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-// 当所有窗口都关闭时退出应用
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit();
 });

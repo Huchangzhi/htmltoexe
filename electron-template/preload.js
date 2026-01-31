@@ -1,6 +1,2 @@
-const { contextBridge, ipcRenderer } = require('electron');
-
-// 安全地暴露一些 API 给渲染进程
-contextBridge.exposeInMainWorld('electronAPI', {
-  getConfig: () => ipcRenderer.invoke('get-config')
-});
+// 预加载脚本 - 为空，因为我们不需要从渲染进程访问特殊 API
+// 所有配置读取都在主进程中完成

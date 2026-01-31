@@ -14,10 +14,12 @@
 ### 方式一：使用预打包的工具（推荐）
 
 1. 从 Actions 下载完整的包：
-   - `htmltoexe-complete` - 完整的应用包（包含 htmltoexe.exe 和 electron-framework）
+   - `htmltoexe-complete` - 完整的应用包（包含 htmltoexe.exe 和预构建的 webview.exe）
 2. 解压后运行 `htmltoexe.exe`
 3. 在界面中填写应用名称、网站 URL、选择图标和输出路径
-4. 点击"生成"按钮，程序会自动创建定制化的 Electron 应用
+4. 点击"生成"按钮，程序会自动创建定制化的 Web 应用
+5. 生成的应用包含一个 exe 文件和一个 config.json 配置文件
+6. 运行 exe 文件即可启动定制化的 Web 应用
 
 ### 方式二：手动配置
 
@@ -25,18 +27,12 @@
 
 ```json
 {
-  "appName": "My Web App",
   "websiteUrl": "https://www.example.com",
   "iconPath": "./icon.png",
-  "outputDir": "./dist",
-  "electron": {
+  "windowOptions": {
     "width": 1200,
     "height": 800,
     "resizable": true,
-    "fullscreen": false,
-    "frame": true,
-    "transparent": false,
-    "backgroundColor": "#ffffff",
     "webPreferences": {
       "nodeIntegration": false,
       "contextIsolation": true
@@ -53,10 +49,10 @@
 
 - `main.py`: 主程序，提供图形界面
 - `config.json`: 默认配置文件
-- `electron-template/`: Electron 应用模板（用于构建框架）
+- `electron-template/`: Electron 应用模板（用于构建预打包的 webview.exe）
 - `.github/workflows/build-electron.yml`: GitHub Actions 构建配置
 
-GitHub Actions 会在每次提交时自动构建完整的 `htmltoexe-complete` 包，其中包含 htmltoexe.exe 和 electron-framework 文件夹，用户下载后即可使用。
+GitHub Actions 会在每次提交时自动构建完整的 `htmltoexe-complete` 包，其中包含 htmltoexe.exe 和预构建的 webview.exe，用户下载后即可使用。
 
 ## 技术栈
 
