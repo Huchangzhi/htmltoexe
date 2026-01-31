@@ -26,7 +26,23 @@ jobs:
     - name: Build Electron app
       run: |
         cd electron-template
-        npx electron-builder --win dir --config
+        echo "当前目录内容:"
+        dir
+        echo "开始构建 Electron 应用..."
+        npx electron-builder --win dir --config --verbose
+        echo "构建完成，检查输出目录:"
+        dir
+        if (Test-Path "dist") {
+          echo "dist 目录内容:"
+          dir dist
+          if (Test-Path "dist\win-unpacked") {
+            echo "找到 win-unpacked 目录，将其移出 dist 目录"
+            Move-Item -Path "dist\win-unpacked" -Destination "..\win-unpacked"
+          }
+        } else {
+          echo "没有找到 dist 目录，检查当前目录是否有 win-unpacked 或其他构建输出:"
+          Get-ChildItem -Path "." -Directory | Where-Object {$_.Name -like "*unpacked*" -or $_.Name -like "*win*"}
+        }
 
     - name: Setup Python
       uses: actions/setup-python@v4
@@ -47,11 +63,21 @@ jobs:
         New-Item -ItemType Directory -Path "htmltoexe-complete" -Force
         Copy-Item "dist\htmltoexe.exe" -Destination "htmltoexe-complete\"
         # 复制已构建的 Electron 应用目录并重命名
-        if (Test-Path "electron-template\win-unpacked") {
+        # 检查多种可能的位置
+        if (Test-Path "win-unpacked") {
+          # 如果构建脚本将 win-unpacked 移到了根目录
+          Copy-Item -Recurse "win-unpacked" -Destination "htmltoexe-complete\electron-framework"
+        } elseif (Test-Path "electron-template\win-unpacked") {
+          # 如果 win-unpacked 仍在 electron-template 目录中
           Copy-Item -Recurse "electron-template\win-unpacked" -Destination "htmltoexe-complete\electron-framework"
+        } elseif (Test-Path "electron-template\dist\win-unpacked") {
+          # 如果 win-unpacked 在 electron-template\dist 目录中
+          Copy-Item -Recurse "electron-template\dist\win-unpacked" -Destination "htmltoexe-complete\electron-framework"
         } else {
           Write-Host "警告: 未找到构建的 Electron 应用"
-          # 如果没找到构建的目录，至少复制模板文件
+          Write-Host "列出 electron-template 目录内容:"
+          Get-ChildItem -Path "electron-template" -Recurse -Directory | Select-Object Name, FullName
+          # 作为后备，复制模板文件
           Copy-Item -Recurse "electron-template" -Destination "htmltoexe-complete\electron-template"
         }
         Copy-Item "config.json" -Destination "htmltoexe-complete\"
