@@ -66,13 +66,19 @@ jobs:
         # 检查多种可能的位置
         if (Test-Path "win-unpacked") {
           # 如果构建脚本将 win-unpacked 移到了根目录
-          Copy-Item -Recurse "win-unpacked" -Destination "htmltoexe-complete\electron-framework"
+          # 将 win-unpacked 的内容直接复制到 electron-framework 目录
+          New-Item -ItemType Directory -Path "htmltoexe-complete\electron-framework" -Force
+          Copy-Item -Recurse "win-unpacked\*" -Destination "htmltoexe-complete\electron-framework"
         } elseif (Test-Path "electron-template\win-unpacked") {
           # 如果 win-unpacked 仍在 electron-template 目录中
-          Copy-Item -Recurse "electron-template\win-unpacked" -Destination "htmltoexe-complete\electron-framework"
+          # 将 win-unpacked 的内容直接复制到 electron-framework 目录
+          New-Item -ItemType Directory -Path "htmltoexe-complete\electron-framework" -Force
+          Copy-Item -Recurse "electron-template\win-unpacked\*" -Destination "htmltoexe-complete\electron-framework"
         } elseif (Test-Path "electron-template\dist\win-unpacked") {
           # 如果 win-unpacked 在 electron-template\dist 目录中
-          Copy-Item -Recurse "electron-template\dist\win-unpacked" -Destination "htmltoexe-complete\electron-framework"
+          # 将 win-unpacked 的内容直接复制到 electron-framework 目录
+          New-Item -ItemType Directory -Path "htmltoexe-complete\electron-framework" -Force
+          Copy-Item -Recurse "electron-template\dist\win-unpacked\*" -Destination "htmltoexe-complete\electron-framework"
         } else {
           Write-Host "警告: 未找到构建的 Electron 应用"
           Write-Host "列出 electron-template 目录内容:"
