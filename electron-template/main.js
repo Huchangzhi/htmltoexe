@@ -7,10 +7,15 @@ function loadConfig() {
   // 首先尝试从可执行文件同级目录读取配置
   const configPath = path.join(path.dirname(process.execPath), 'config.json');
 
+  console.log(`尝试从 ${configPath} 读取配置文件`);
+
   if (fs.existsSync(configPath)) {
     try {
       const configData = fs.readFileSync(configPath, 'utf8');
-      return JSON.parse(configData);
+      console.log('配置文件内容:', configData);
+      const parsedConfig = JSON.parse(configData);
+      console.log('解析后的配置:', parsedConfig);
+      return parsedConfig;
     } catch (err) {
       console.error('解析配置文件失败:', err);
       // 返回默认配置

@@ -33,10 +33,12 @@ def load_config():
         messagebox.showerror("错误", f"加载配置文件失败: {e}")
         return None
 
-def save_config(config):
+def save_config(config, filepath=None):
     """保存配置到 config.json"""
     try:
-        with open('config.json', 'w', encoding='utf-8') as f:
+        if filepath is None:
+            filepath = 'config.json'  # 默认路径
+        with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(config, f, indent=2, ensure_ascii=False)
         return True
     except Exception as e:
@@ -97,7 +99,7 @@ def modify_electron_app():
 
     # 保存配置到输出目录
     config_path = os.path.join(final_output_path, "config.json")
-    if not save_config(config):
+    if not save_config(config, config_path):
         return
 
     # 如果提供了图标，则复制到输出目录
@@ -109,7 +111,7 @@ def modify_electron_app():
             # 更新配置文件中的图标路径
             config["iconPath"] = os.path.basename(icon_path)
             # 重新保存配置文件以更新图标路径
-            if not save_config(config):
+            if not save_config(config, config_path):
                 return
         except Exception as e:
             messagebox.showerror("错误", f"复制图标文件失败: {e}")
