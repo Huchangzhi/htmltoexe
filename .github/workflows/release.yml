@@ -1,13 +1,19 @@
-name: Build HTMLtoEXE
+name: Release HTMLtoEXE
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version_number:
+        description: 'Version Number (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+      release_notes:
+        description: 'Release Notes'
+        required: false
+        default: 'New release of HTMLtoEXE'
 
 jobs:
-  build:
+  build-and-release:
     runs-on: windows-latest
 
     steps:
@@ -27,6 +33,8 @@ jobs:
       run: |
         cd electron-template
         npx electron-builder --win dir --config
+        # 检查构建输出
+        dir
 
     - name: Setup Python
       uses: actions/setup-python@v4
@@ -51,19 +59,27 @@ jobs:
           Copy-Item -Recurse "electron-template\win-unpacked" -Destination "htmltoexe-complete\electron-framework"
         } else {
           Write-Host "警告: 未找到构建的 Electron 应用"
-          # 如果没找到构建的目录，至少复制模板文件
-          Copy-Item -Recurse "electron-template" -Destination "htmltoexe-complete\electron-template"
         }
         Copy-Item "config.json" -Destination "htmltoexe-complete\"
 
-    - name: Upload complete package
-      uses: actions/upload-artifact@v4
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: htmltoexe-complete
-        path: htmltoexe-complete/
+        tag_name: v${{ github.event.inputs.version_number }}
+        release_name: 'HTMLtoEXE v${{ github.event.inputs.version_number }}'
+        body: ${{ github.event.inputs.release_notes }}
+        draft: false
+        prerelease: false
 
-    - name: Upload standalone exe
-      uses: actions/upload-artifact@v4
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: htmltoexe-exe
-        path: dist/htmltoexe.exe
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./htmltoexe-complete
+        asset_name: htmltoexe-complete-v${{ github.event.inputs.version_number }}.zip
+        asset_content_type: application/zip
