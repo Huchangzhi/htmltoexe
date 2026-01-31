@@ -197,29 +197,22 @@ function showAboutDialog() {
           ${logoHtml}
           <h2>${appName}</h2>
           <p>版本: ${appVersion}</p>
-          <p>powerd by <a href="#" class="link" onclick="openLink('https://github.com/huchangzhi/htmltoexe')">htmltoexe</a></p>
+          <p><a href="https://github.com/huchangzhi/htmltoexe" class="link" target="_blank">powerd by htmltoexe</a></p>
         </div>
       </div>
-      <script>
-        function openLink(url) {
-          // 通过 IPC 发送到主进程打开外部链接
-          if (typeof require !== 'undefined') {
-            const { ipcRenderer } = require('electron');
-            ipcRenderer.send('open-external-link', url);
-          }
-        }
-      </script>
     </body>
     </html>
   `;
 
   aboutWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(aboutHTML));
 
-  // 监听打开外部链接事件
-  aboutWindow.webContents.on('ipc-message', (event, channel, url) => {
-    if (channel === 'open-external-link') {
+  // 设置关于窗口导航，允许外部链接打开
+  aboutWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
       shell.openExternal(url);
+      return { action: 'deny' };
     }
+    return { action: 'allow' };
   });
 }
 
