@@ -92,6 +92,11 @@ jobs:
         }
         Copy-Item "config.json" -Destination "htmltoexe-complete\"
 
+    - name: Zip complete package
+      run: |
+        # 压缩完整的应用包
+        Compress-Archive -Path "htmltoexe-complete\*" -DestinationPath "htmltoexe-complete-v${{ github.event.inputs.version_number }}.zip"
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -110,6 +115,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./htmltoexe-complete
+        asset_path: ./htmltoexe-complete-v${{ github.event.inputs.version_number }}.zip
         asset_name: htmltoexe-complete-v${{ github.event.inputs.version_number }}.zip
         asset_content_type: application/zip
