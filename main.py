@@ -59,71 +59,70 @@ def modify_electron_app():
         messagebox.showerror("错误", "输出路径不能为空!")
         return
 
-    # 定义路径
-    electron_template_dir = "electron-template"  # 预打包的 Electron 应用模板
-    modified_app_dir = "my-electron-app"  # 修改后的应用目录
+    # 定义路径 - 在当前目录下查找 electron-framework 文件夹
+    electron_framework_dir = "electron-framework"  # 预打包的 Electron 应用框架
 
-    # 检查 Electron 模板是否存在
-    if not os.path.exists(electron_template_dir):
-        messagebox.showerror("错误", f"未找到 Electron 模板文件夹 '{electron_template_dir}'! 请确保已下载预打包的 Electron 框架.")
+    # 检查 Electron 框架是否存在
+    if not os.path.exists(electron_framework_dir):
+        messagebox.showerror("错误", f"未找到 Electron 框架文件夹 '{electron_framework_dir}'! 请确保已下载预打包的 Electron 框架.")
         return
 
-    # 创建修改后的应用目录
-    try:
-        if os.path.exists(modified_app_dir):
-            shutil.rmtree(modified_app_dir)  # 如果已存在,删除它
-        shutil.copytree(electron_template_dir, modified_app_dir)
-    except Exception as e:
-        messagebox.showerror("错误", f"复制 Electron 模板失败: {e}")
-        return
+    # 创建临时修改的应用目录
+    import tempfile
+    with tempfile.TemporaryDirectory() as temp_dir:
+        modified_app_dir = os.path.join(temp_dir, "modified-app")
 
-    # 更新配置文件
-    config = {
-        "appName": name,
-        "websiteUrl": url,
-        "iconPath": icon_path if icon_path else "./icon.png",
-        "outputDir": output_path,
-        "electron": {
-            "width": 1200,
-            "height": 800,
-            "resizable": True,
-            "fullscreen": False,
-            "frame": True,
-            "transparent": False,
-            "backgroundColor": "#ffffff",
-            "webPreferences": {
-                "nodeIntegration": True,  # Windows 7 兼容性考虑
-                "contextIsolation": False  # Windows 7 兼容性考虑
-            }
-        }
-    }
-
-    # 保存配置到应用目录
-    config_path = os.path.join(modified_app_dir, "config.json")
-    if not save_config(config):
-        return
-
-    # 如果提供了图标，则复制到应用目录
-    if icon_path and os.path.exists(icon_path):
+        # 复制框架到临时目录进行修改
         try:
-            app_icon_path = os.path.join(modified_app_dir, "icon.png")
-            shutil.copy(icon_path, app_icon_path)
+            shutil.copytree(electron_framework_dir, modified_app_dir)
         except Exception as e:
-            messagebox.showerror("错误", f"复制图标文件失败: {e}")
+            messagebox.showerror("错误", f"复制 Electron 框架失败: {e}")
             return
 
-    # 移动到最终输出路径
-    try:
-        final_output_path = os.path.join(output_path, name)
-        if os.path.exists(final_output_path):
-            shutil.rmtree(final_output_path)  # 如果目标路径已存在,删除它
-        shutil.move(modified_app_dir, final_output_path)
+        # 更新配置文件
+        config = {
+            "appName": name,
+            "websiteUrl": url,
+            "iconPath": icon_path if icon_path else "./icon.png",
+            "outputDir": output_path,
+            "electron": {
+                "width": 1200,
+                "height": 800,
+                "resizable": True,
+                "fullscreen": False,
+                "frame": True,
+                "transparent": False,
+                "backgroundColor": "#ffffff",
+                "webPreferences": {
+                    "nodeIntegration": True,  # Windows 7 兼容性考虑
+                    "contextIsolation": False  # Windows 7 兼容性考虑
+                }
+            }
+        }
 
-        # 同时复制 config.json 到输出目录（以便 Electron 应用启动时读取）
-        shutil.copy(config_path, os.path.join(final_output_path, "config.json"))
-    except Exception as e:
-        messagebox.showerror("错误", f"移动应用到输出目录失败: {e}")
-        return
+        # 保存配置到应用目录
+        config_path = os.path.join(modified_app_dir, "config.json")
+        if not save_config(config):
+            return
+
+        # 如果提供了图标，则复制到应用目录
+        if icon_path and os.path.exists(icon_path):
+            try:
+                app_icon_path = os.path.join(modified_app_dir, "icon.png")
+                shutil.copy(icon_path, app_icon_path)
+            except Exception as e:
+                messagebox.showerror("错误", f"复制图标文件失败: {e}")
+                return
+
+        # 移动到最终输出路径
+        try:
+            final_output_path = os.path.join(output_path, name)
+            if os.path.exists(final_output_path):
+                shutil.rmtree(final_output_path)  # 如果目标路径已存在,删除它
+            shutil.move(modified_app_dir, final_output_path)
+        except Exception as e:
+            messagebox.showerror("错误", f"移动应用到输出目录失败: {e}")
+            return
 
     messagebox.showinfo("成功", f"Electron 应用已成功生成! 文件位于 '{final_output_path}'.")
 

@@ -1,4 +1,4 @@
-name: Build Electron App
+name: Build HTMLtoEXE
 
 on:
   push:
@@ -8,32 +8,38 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
+    - name: Setup Python
+      uses: actions/setup-python@v4
       with:
-        node-version: '18'
+        python-version: '3.8'
 
-    - name: Install dependencies
+    - name: Install Python dependencies
       run: |
-        cd electron-template
-        npm install
+        pip install pyinstaller
+        pip install tkinter
 
-    - name: Build Electron app
+    - name: Build htmltoexe.exe
       run: |
-        cd electron-template
-        npm run build
+        pyinstaller --onefile --windowed --add-data "config.json;." --name "htmltoexe" main.py
 
-    - name: Upload built app
+    - name: Prepare Electron framework
+      run: |
+        # 复制 electron-template 作为框架
+        Copy-Item -Recurse -Path "electron-template" -Destination "electron-framework"
+
+    - name: Upload htmltoexe.exe
       uses: actions/upload-artifact@v4
       with:
-        name: electron-app-${{ matrix.os }}
-        path: electron-template/dist/
+        name: htmltoexe-exe
+        path: dist/htmltoexe.exe
+
+    - name: Upload Electron framework
+      uses: actions/upload-artifact@v4
+      with:
+        name: electron-framework
+        path: electron-framework/
