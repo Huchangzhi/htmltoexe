@@ -26,7 +26,7 @@ jobs:
     - name: Build Electron app
       run: |
         cd electron-template
-        npx electron-builder --win --config
+        npx electron-builder --win portable --config
 
     - name: Setup Python
       uses: actions/setup-python@v4

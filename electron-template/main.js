@@ -4,36 +4,32 @@ const fs = require('fs');
 
 // 读取配置文件
 function loadConfig() {
-  const configPath = path.join(process.resourcesPath, 'config.json'); // 从资源目录读取
-  const fallbackConfigPath = path.join(path.dirname(process.execPath), 'config.json'); // 从同级目录读取
+  // 首先尝试从可执行文件同级目录读取配置
+  const configPath = path.join(path.dirname(process.execPath), 'config.json');
 
-  let configData;
-  
-  // 尝试从不同位置读取配置文件
   if (fs.existsSync(configPath)) {
-    configData = fs.readFileSync(configPath, 'utf8');
-  } else if (fs.existsSync(fallbackConfigPath)) {
-    configData = fs.readFileSync(fallbackConfigPath, 'utf8');
+    try {
+      const configData = fs.readFileSync(configPath, 'utf8');
+      return JSON.parse(configData);
+    } catch (err) {
+      console.error('解析配置文件失败:', err);
+      // 返回默认配置
+      return {
+        websiteUrl: 'https://www.example.com',
+        windowOptions: {
+          width: 1200,
+          height: 800,
+          resizable: true,
+          webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true
+          }
+        }
+      };
+    }
   } else {
     // 如果没有配置文件，使用默认配置
-    return {
-      websiteUrl: 'https://www.example.com',
-      windowOptions: {
-        width: 1200,
-        height: 800,
-        resizable: true,
-        webPreferences: {
-          nodeIntegration: false,
-          contextIsolation: true
-        }
-      }
-    };
-  }
-
-  try {
-    return JSON.parse(configData);
-  } catch (err) {
-    console.error('解析配置文件失败:', err);
+    console.log('未找到配置文件，使用默认设置');
     return {
       websiteUrl: 'https://www.example.com',
       windowOptions: {
@@ -58,8 +54,7 @@ function createWindow() {
     resizable: config.windowOptions?.resizable !== false,
     webPreferences: {
       ...(config.windowOptions?.webPreferences || {}),
-      preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: config.windowOptions?.webPreferences?.nodeIntegration || false,
+      nodeIntegration: config.windowOptions?.webPreferences?.nodeIntegration !== false,
       contextIsolation: config.windowOptions?.webPreferences?.contextIsolation !== false
     }
   };

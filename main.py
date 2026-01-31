@@ -108,13 +108,14 @@ def modify_electron_app():
 
             # 更新配置文件中的图标路径
             config["iconPath"] = os.path.basename(icon_path)
+            # 重新保存配置文件以更新图标路径
             if not save_config(config):
                 return
         except Exception as e:
             messagebox.showerror("错误", f"复制图标文件失败: {e}")
             return
 
-    messagebox.showinfo("成功", f"Web 应用已成功生成! 文件位于 '{final_output_path}'.\n\n您可以直接运行 {name}.exe 来启动应用。")
+    messagebox.showinfo("成功", f"Web 应用已成功生成! 文件位于 '{final_output_path}'.\n\n您可以直接运行 {name}.exe 来启动应用。\n\n注意：{name}.exe 会读取同目录下的 config.json 文件来加载网站。")
 
 # 创建 Tkinter 图形界面
 root = tk.Tk()

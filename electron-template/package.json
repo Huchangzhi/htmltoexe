@@ -1,5 +1,5 @@
 {
-  "name": "electron-web-app",
+  "name": "webview",
   "version": "1.0.0",
   "description": "A web application packaged with Electron",
   "main": "main.js",
@@ -20,15 +20,26 @@
     "electron-config": "^2.0.0"
   },
   "build": {
-    "appId": "com.htmltoexe.electron-web-app",
-    "productName": "Electron Web App",
+    "appId": "com.htmltoexe.webview",
+    "productName": "WebView",
     "directories": {
       "output": "dist"
     },
     "win": {
-      "target": "nsis",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
       "icon": "icon.png",
       "publish": null
-    }
+    },
+    "portable": {
+      "artifactName": "${productName}.${ext}"
+      }
   }
 }
