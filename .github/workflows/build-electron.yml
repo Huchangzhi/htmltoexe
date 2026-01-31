@@ -21,7 +21,7 @@ jobs:
     - name: Install Node dependencies
       run: |
         cd electron-template
-        npm ci
+        npm install
 
     - name: Build Electron app
       run: |
