@@ -21,7 +21,6 @@ jobs:
     - name: Install Python dependencies
       run: |
         pip install pyinstaller
-        pip install tkinter
 
     - name: Build htmltoexe.exe
       run: |

@@ -75,7 +75,15 @@ GitHub Actions 会在每次提交时自动构建 htmltoexe.exe 和 electron-fram
 
 ## 下载
 
-[下载 htmltoexe 工具](https://github.com/Huchangzhi/htmltoexe/releases/download/v1.0.1/htmltoexe.exe)
+由于现在采用新的构建方式，您需要从 GitHub Actions 中下载构建产物：
+
+1. 访问 [Actions 页面](../../actions)
+2. 点击最新的构建任务
+3. 下载以下两个构件：
+   - `htmltoexe-exe` - 主程序
+   - `electron-framework` - Electron 框架
+
+将这两个文件放在同一目录下即可使用。
 
 ## 许可证
 
