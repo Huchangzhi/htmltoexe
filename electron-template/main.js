@@ -4,9 +4,11 @@ const fs = require('fs');
 
 // 读取配置文件
 function loadConfig() {
-  // 首先尝试从可执行文件同级目录读取配置
-  const configPath = path.join(path.dirname(process.execPath), 'config.json');
+  // 尝试多个位置查找配置文件
+  let configPath;
 
+  // 1. 首先尝试从当前工作目录读取（用户运行exe的目录）
+  configPath = path.join(process.cwd(), 'config.json');
   console.log(`尝试从 ${configPath} 读取配置文件`);
 
   if (fs.existsSync(configPath)) {
@@ -18,36 +20,57 @@ function loadConfig() {
       return parsedConfig;
     } catch (err) {
       console.error('解析配置文件失败:', err);
-      // 返回默认配置
-      return {
-        websiteUrl: 'https://www.example.com',
-        windowOptions: {
-          width: 1200,
-          height: 800,
-          resizable: true,
-          webPreferences: {
-            nodeIntegration: false,
-            contextIsolation: true
-          }
-        }
-      };
     }
-  } else {
-    // 如果没有配置文件，使用默认配置
-    console.log('未找到配置文件，使用默认设置');
-    return {
-      websiteUrl: 'https://www.example.com',
-      windowOptions: {
-        width: 1200,
-        height: 800,
-        resizable: true,
-        webPreferences: {
-          nodeIntegration: false,
-          contextIsolation: true
-        }
-      }
-    };
   }
+
+  // 2. 尝试从可执行文件同级目录读取配置（标准情况）
+  configPath = path.join(path.dirname(process.execPath), 'config.json');
+  console.log(`尝试从 ${configPath} 读取配置文件`);
+
+  if (fs.existsSync(configPath)) {
+    try {
+      const configData = fs.readFileSync(configPath, 'utf8');
+      console.log('配置文件内容:', configData);
+      const parsedConfig = JSON.parse(configData);
+      console.log('解析后的配置:', parsedConfig);
+      return parsedConfig;
+    } catch (err) {
+      console.error('解析配置文件失败:', err);
+    }
+  }
+
+  // 3. 如果在标准位置找不到，尝试从 resources 目录读取（打包后的情况）
+  if (process.resourcesPath) {
+    configPath = path.join(process.resourcesPath, 'config.json');
+    console.log(`尝试从 ${configPath} 读取配置文件`);
+
+    if (fs.existsSync(configPath)) {
+      try {
+        const configData = fs.readFileSync(configPath, 'utf8');
+        console.log('配置文件内容:', configData);
+        const parsedConfig = JSON.parse(configData);
+        console.log('解析后的配置:', parsedConfig);
+        return parsedConfig;
+      } catch (err) {
+        console.error('解析配置文件失败:', err);
+      }
+    }
+  }
+
+  // 如果都没有找到配置文件，使用默认配置
+  console.log('未找到配置文件，使用默认设置');
+  return {
+    websiteUrl: 'https://www.example.com',
+    windowOptions: {
+      width: 1200,
+      height: 800,
+      resizable: true,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true
+      }
+    }
+  };
 }
 
 function createWindow() {
